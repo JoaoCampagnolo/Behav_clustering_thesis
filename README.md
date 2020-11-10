@@ -31,6 +31,6 @@ hand tuned parameters.
 **_Keywords_**: _Drosophila_, behavior, posture-dynamics space, unsupervised learning, clustering,
 t-SNE, PCA, Gaussian Mixture Model, HDBSCAN.
 
-This repository holds: **1)** Developed code; **2)** Dataset; **3)** Cluster results.
-
+This repository holds: **1)** Developed code; **2)** Dataset; **3)** Cluster results.\
+\
 The code was developed at EPFL's Ramdya Lab. Many thanks to Pavan Ramdya, Semih Günel and the remaining lab members - it was a pleasure to work in your company.
