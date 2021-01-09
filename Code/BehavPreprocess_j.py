@@ -33,14 +33,14 @@ LABEL = 1
 
 
 class BehavPreprocess(Dataset):
-    def __init__(self, root_dir, stride=10, clip_len=100, dilation=1, min_frequency=5, max_frequency=50, num_channels=25, wavelet=True, smooth=True, normalize=True, halla_method=True, mean_center=True):
+    def __init__(self, root_dir, stride=10, clip_len=100, dilation=1, min_frequency=5, max_frequency=50, num_channels=25, use_angles=True, smooth=True, normalize=True, halla_method=True, mean_center=True):
 
         self.root_path_list = root_dir
         self.stride = stride
         self.clip_len = clip_len
         self.smooth = smooth
         self.dilation = dilation
-        self.wavelet = wavelet
+        self.use_angles = use_angles
         self.halla_method = halla_method
         self.mean_center = mean_center
         self.normalize = normalize
@@ -105,7 +105,7 @@ class BehavPreprocess(Dataset):
 
         # Time-frequency analysis
         print("Performing time-frequency analysis")
-        if self.wavelet:
+        if self.use_angles:
             for exp_idx, experiment in enumerate(self.angl_exp_list):
                 wav_exp, freq_channels = find_wav(experiment, chan=self.num_channels,
                                       omega0=5, fps=100,
@@ -166,19 +166,25 @@ class BehavPreprocess(Dataset):
                         if min(abs(offset_mid - offset_gt_start), abs(offset_mid - offset_gt_end)) > self.clip_len // 3:
                             self.data_behav_concat[exp_idx][offset_mid] = label_gt_behav.value
 
-        if self.wavelet:
-            # setting the rest frames
-            self.test_rest_mask = []
-            for exp_idx, experiment in enumerate(self.exp_path_list):
-                thr = filters.threshold_otsu(self.frame_var_list[exp_idx], nbins=len(experiment) // 2)
-                rest_mask = self.frame_var_list[exp_idx] < thr
-                self.test_rest_mask.append(rest_mask)
-                self.data_behav_concat[exp_idx][rest_mask] = Behav.REST.value
+        # setting the rest frames
+        self.test_rest_mask = []
+        for exp_idx, experiment in enumerate(self.exp_path_list):
+            thr = filters.threshold_otsu(self.frame_var_list[exp_idx], nbins=len(experiment) // 2)
+            rest_mask = self.frame_var_list[exp_idx] < thr
+            self.test_rest_mask.append(rest_mask)
+            self.data_behav_concat[exp_idx][rest_mask] = Behav.REST.value
+                
+        # setting the boundary frames
+        self.test_boundary_mask = []
+        for exp_idx, experiment in enumerate(self.exp_path_list):
+            boundary_mask = np.zeros(len(self.frame_var_list[exp_idx]))
+            boundary_mask[:50] = 1; boundary_mask[-50:] = 1
+            bound_mask = boundary_mask > 0
+            self.test_boundary_mask.append(bound_mask)
+            self.data_behav_concat[exp_idx][bound_mask] = Behav.BOUNDARY.value
 
-        if self.wavelet:
-            self.data_concat = np.concatenate(self.wav_exp_list, axis=0)
-        else:
-            self.data_concat = np.concatenate(self.wav_exp_list, axis=0) # Replace by pts3d_exp_list
+        # concatenate the data
+        self.data_concat = np.concatenate(self.wav_exp_list, axis=0)
             
         self.data_behav_concat = np.concatenate(self.data_behav_concat, axis=0)
         print("Experiment concat shape {}".format(np.shape(np.array(self.data_concat))))

@@ -9,6 +9,7 @@ class Behav(Enum):
     GROOM_FLEG = 4
     GROOM_ANT = 5
     NONE = 6
+    BOUNDARY = 7
 
 # Reassign data directories: new folder is /Volumes/jhc_data/JHC/paper...
 label_gt_list = [([0, 140], Behav.REST, 'paper/180919_MDN_CsCh/Fly6/001_SG1'),

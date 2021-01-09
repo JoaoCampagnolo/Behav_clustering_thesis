@@ -321,7 +321,7 @@ def wavelet_transform(angles, fps=100, chan=25, fmin=1, fmax=50, pca_dim=None, c
 
 # DIMENSIONALITY REDUCTION ############################################################################################
 
-def see_2D_data(data_embed, activity, fly_tags, train_exp_index, pipeline, short_tags=False, tag_end=13):
+def see_2D_data(data_embed, activity, fly_tags, train_exp_index, pipeline, store_path, short_tags=False, tag_end=13):
     '''
     Shows embedded 2D results from t-SNE or PCA. Also stores the data in a Pandas dataframe.
     '''
@@ -357,14 +357,15 @@ def see_2D_data(data_embed, activity, fly_tags, train_exp_index, pipeline, short
     
     # Scatter plot while assigning point colors and sizes to different variables in the dataset
     n_subj = len(np.unique(np.asarray(data_frame_2d['Subject'])))
-    sns_scatter("$Z_1$", "$Z_2$", "Subject", "Frame activity", data_frame_2d, pipeline,
+    sns_scatter("$Z_1$", "$Z_2$", "Subject", "Frame activity", data_frame_2d, pipeline, store_path, '/fr_subject.png',
                 cpal=sns.color_palette('Spectral', n_subj, desat=.95), fsize=12, xloc=-.12)
-    sns_scatter("$Z_1$", "$Z_2$", "Frame activity", "Frame activity", data_frame_2d, pipeline,
+    sns_scatter("$Z_1$", "$Z_2$", "Frame activity", "Frame activity", data_frame_2d, pipeline, store_path, '/fr_activity.png',
                 cpal='coolwarm', fsize=8, cols=1, xloc=1.10, yloc=0.90)
     
     return data_frame_2d
 
-def sns_scatter(x, y, hue, size, dataframe, title, cpal="Set2", fsize=10, alpha=0.2, cols=6, xloc=-0.20, yloc=-0.08):
+def sns_scatter(x, y, hue, size, dataframe, title, store_path, fig_name,
+                cpal="Set2", fsize=10, alpha=0.2, cols=6, xloc=-0.20, yloc=-0.08):
         f, ax = plt.subplots(figsize=(fsize, fsize))
         ax.set_title(title)
         sns.despine(f, left=True, bottom=True)
@@ -374,20 +375,21 @@ def sns_scatter(x, y, hue, size, dataframe, title, cpal="Set2", fsize=10, alpha=
                         sizes=(1, 70), linewidth=0.2,
                         data=dataframe, ax=ax, alpha=alpha)
         plt.legend(loc='upper left', bbox_to_anchor=(xloc, yloc), fancybox=True, shadow=False, ncol=cols)
+        f.savefig(store_path+fig_name, bbox_inches='tight')
 
     
 
 # SEGMENTATION ########################################################################################################
 
 def plt_segmentation(low_dim_train, cluster_labels, prob_dens_f, mesh, b_mask,
-                     is_mesh, data_frame_2d, mesh_magnitude, post_prob, mode, xmax, ymax, pix_to_point_idx, pipeline,
-                     classvtime=False):
+                     is_mesh, data_frame_2d, mesh_magnitude, post_prob, mode, xmax, ymax, pix_to_point_idx, pipeline, 
+                     store_path, classvtime=False):
     if is_mesh:
         # Plot embedded clusters
-        borders = see_clusters(low_dim_train, mesh, cluster_labels, prob_dens_f, b_mask, is_watershed=is_mesh)
+        borders = see_clusters(low_dim_train, mesh, cluster_labels, prob_dens_f, b_mask, store_path, is_watershed=is_mesh)
         
         # Plot clusters per genome
-        watershed_genomes(data_frame_2d, mesh_magnitude, borders, b_mask, dim=xmax)
+        watershed_genomes(data_frame_2d, mesh_magnitude, borders, b_mask, store_path, dim=xmax)
         
         # cluster Dataframe
         labels_arr, _ = reshape_mesh_labels(mesh, cluster_labels, pix_to_point_idx, xmax, ymax)
@@ -395,9 +397,9 @@ def plt_segmentation(low_dim_train, cluster_labels, prob_dens_f, mesh, b_mask,
         data_frame_cluster = pd.concat([data_frame_2d, pd.DataFrame(n_labels, columns=['Cluster ID'])],
                                axis=1)
         n_clusters = len(np.unique(np.asarray(data_frame_cluster['Cluster ID'])))
-        sns_scatter("$Z_1$", "$Z_2$", "Cluster ID", None, data_frame_cluster, pipeline,
+        sns_scatter("$Z_1$", "$Z_2$", "Cluster ID", None, data_frame_cluster, pipeline, store_path, '/cluster_tags.png',
                     cpal = sns.color_palette('icefire_r', n_clusters, desat=.95),
-                    fsize=7, cols=8)
+                    fsize=7, alpha=0.2, cols=8, xloc=-0.20, yloc=-0.08)
 
 
     else:
@@ -408,12 +410,12 @@ def plt_segmentation(low_dim_train, cluster_labels, prob_dens_f, mesh, b_mask,
         colors = get_colors()
         n_clusters = len(np.unique(np.asarray(data_frame_cluster['Cluster ID'])))
 #         cmap = cmr.redshift
-        sns_scatter("$Z_1$", "$Z_2$", "Cluster ID", None, data_frame_cluster, pipeline,
-                    cpal = sns.color_palette('icefire_r', n_clusters, desat=.95),
-                    fsize=7, cols=8)
+        sns_scatter("$Z_1$", "$Z_2$", "Cluster ID", None, data_frame_cluster, title=pipeline, store_path=store_path,
+                    fig_name='/cluster_tags.png', cpal=sns.color_palette('icefire_r', n_clusters, desat=.95),
+                    fsize=7, alpha=0.2, cols=8, xloc=-0.20, yloc=-0.08)
         
         # Plot clusters per genome
-        direct_cluster_genomes(data_frame_cluster)
+        direct_cluster_genomes(data_frame_cluster, store_path)
     
     if mode == 2:
         if classvtime == True:
@@ -421,10 +423,11 @@ def plt_segmentation(low_dim_train, cluster_labels, prob_dens_f, mesh, b_mask,
             dims = (24, 4)
             fig, ax = pyplot.subplots(figsize=dims)
             sns.lineplot(ax=ax, data=data, palette="Set2", dashes=False, legend=False)
+            fig.savefig(store_path+'/post_proba.png')
         
     return data_frame_cluster
                      
-def see_clusters(data_embed, mesh, cluster_labels, pdf, b_mask, is_watershed, shade=0.0001):
+def see_clusters(data_embed, mesh, cluster_labels, pdf, b_mask, sotre_path, is_watershed, shade=0.0001):
     '''
     Shows embedded clusters
     '''
@@ -496,7 +499,7 @@ def see_clusters(data_embed, mesh, cluster_labels, pdf, b_mask, is_watershed, sh
 #                     loc="lower right", title="cluster labels")
 
 
-def watershed_genomes(data_frame_2d, mesh_magnitude, borders, b_mask, dim):
+def watershed_genomes(data_frame_2d, mesh_magnitude, borders, b_mask, store_path, dim):
     for i in range(len(np.unique(np.asarray(data_frame_2d['Genotype'])))):
         genotype = np.unique(np.asarray(data_frame_2d['Genotype']))[i]
         gen_mask = pd.DataFrame([data_frame_2d['Genotype'] == genotype for key, val in data_frame_2d.items()]).T.all(axis=1)
@@ -526,13 +529,14 @@ def watershed_genomes(data_frame_2d, mesh_magnitude, borders, b_mask, dim):
         plt.title(genotype, fontsize=20)
         plt.imshow(img) #border_pdf as alternative
         plt.axis('off')
+        plt.savefig(store_path+f'/{genotype}_occupancy.png')
 #         plt.ylabel('$Z_2$')
 #         plt.xlabel('$Z_1$')
 #         plt.colorbar()
 #         plt.imshow(map_mesh(embed_data, mesh_magnitude)[0])
 #         plt.imshow(pdf_segments(pdf, labels)[0])
 
-def direct_cluster_genomes(data_frame_cluster):
+def direct_cluster_genomes(data_frame_cluster, store_path):
     num_class = data_frame_cluster['Cluster ID'].max()
     colors = get_colors()
     for i in range(len(np.unique(np.asarray(data_frame_cluster['Genotype'])))):
@@ -543,7 +547,7 @@ def direct_cluster_genomes(data_frame_cluster):
 #         plt.figure()
 #         plt.title(genotype)
         n_clust_loc = len(np.unique(np.asarray(df['Cluster ID'])))
-        sns_scatter("$Z_1$", "$Z_2$", "Cluster ID", None, df, None,
+        sns_scatter("$Z_1$", "$Z_2$", "Cluster ID", None, df, f'{genotype}', store_path, f'/{genotype}_cluster_tag.png',
                     cpal=sns.color_palette('icefire_r',n_clust_loc), fsize=7, alpha=0.1)
         ax = plt.gca()
         ax.set_title(genotype)
@@ -689,7 +693,7 @@ def plot_cluster_frame_dist(frame_numbers, dims=(20, 5)):
            xlabel='Cluster Number')
     sns.despine(left=True, bottom=True)
     
-def plot_markov_hist(mtm, frame_numbers, titl, dims=(10,10)):
+def plot_markov_hist(mtm, frame_numbers, store_path, titl, dims=(10,10)):
     
     # Initialize the matplotlib figure
     f = plt.figure(figsize=dims)   
@@ -718,13 +722,13 @@ def plot_markov_hist(mtm, frame_numbers, titl, dims=(10,10)):
     sns.despine(left=True, bottom=True)
 
     plt.tight_layout()
-#     plt.savefig('grid_figure.pdf')
+    f.savefig(store_path+'/Markov_hist.png', bbox_inches='tight')
     
     
     
     
     
-def fly_frame_dist(data_frame_cluster, titl):
+def fly_frame_dist(data_frame_cluster, titl, store_path):
     # Find fly frames centroids:
     fly_df = data_frame_cluster.groupby(['Subject'])['$Z_1$', '$Z_2$'].mean()
     flies = np.unique(data_frame_cluster['Subject'])
@@ -761,6 +765,7 @@ def fly_frame_dist(data_frame_cluster, titl):
                             palette=sns.color_palette("Spectral", len(np.unique(np.asarray(fly_arrays['Fly'])))),
                             sizes=(1000, 5000), linewidth=0.2,
                             data=fly_arrays, ax=ax, alpha=.5)
+#     f.savefig(store_path+'/centroids.png')
     
     # EXTRACT CURRENT HANDLES AND LABELS
     h,l = ax.get_legend_handles_labels()
@@ -781,7 +786,7 @@ def fly_frame_dist(data_frame_cluster, titl):
     ax2.set_yticks(np.arange(len(np.unique(np.asarray(fly_arrays['Fly'])))))
     ax2.set_yticklabels(np.unique(np.asarray(fly_arrays['Fly'])), fontsize=9)
     ax2.set_xticklabels([])
-#     g.savefig('/Users/joaohenrique/Documents/EPFL/joao_pose/results/distances.png')
+    g.savefig(store_path+'/cent_pair_dist.png', bbox_inches='tight')
     
     # Embedding homogeneity
     s_dmat = np.take(d_mat,np.random.permutation(d_mat.shape[0]),axis=0)
@@ -791,11 +796,12 @@ def fly_frame_dist(data_frame_cluster, titl):
     
 # STORE RESULTS #######################################################################################################   
     
-def store_metrics(titl, cluster_entropy, mean_dwell, embed_homog, run_t, new_df=False):
+def store_metrics(titl, cluster_entropy, mean_dwell, embed_homog, run_t, fly_uncomp, centroid_dists, new_df=False):
     '''Group the metrics from the dataset, and store them with pickle. Then open and store new values...'''
-    mets = [titl, cluster_entropy, mean_dwell, embed_homog, run_t]
+    mets = [titl, cluster_entropy, mean_dwell, embed_homog, run_t, fly_uncomp, centroid_dists]
     if new_df:
-        metrics_df = pd.DataFrame(columns=['Pipeline', 'Entropy', 'Mdt', 'Homogeneity', 'Time'])
+        metrics_df = pd.DataFrame(columns=['Pipeline', 'Entropy', 'Mdt', 'Homogeneity', 'Time', 
+                                           'Fly_Uncomp', 'Centroid_dist'])
         metrics_df.loc[0] = mets
     else:
         metrics_df = pd.read_pickle('/Users/joaohenrique/Documents/EPFL/joao_pose/results' + '/metrics_df.pickle')
