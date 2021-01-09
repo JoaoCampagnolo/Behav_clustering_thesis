@@ -1,5 +1,5 @@
 # Behav_clustering_thesis
-Master thesis project on _Unsupervised behavioral classification with 3D pose data from tethered Drosophila Melanogaster_.
+Master thesis project on _Unsupervised behavioral classification with 3D pose data from tethered Drosophila melanogaster_.
 
 **_ABSTRACT_**  
 One of the preeminent challenges of Behavioral Neuroscience is the understanding of how the
@@ -10,7 +10,7 @@ of current approaches, motivate an ongoing search for systematic, unbiased behav
 techniques.
 To accomplish such a classification, this study employs a state-of-the-art tool for tracking 3D
 pose of tethered _Drosophila_, _DeepFly3D_, to collect a dataset of x-, y- and z- landmark positions over
-time, from tethered _Drosophila Melanogaster_ moving over an air-suspended ball. This is succeeded by
+time, from tethered _Drosophila melanogaster_ moving over an air-suspended ball. This is succeeded by
 unprecedented normalization across individual flies by computing the angles between adjoining
 landmarks, followed by standard wavelet analysis. Subsequently, six unsupervised behavior
 classification techniques are compared - four of which follow proven formulas, while the remaining two
