@@ -33,4 +33,23 @@ t-SNE, PCA, Gaussian Mixture Model, HDBSCAN.
 
 This repository holds: **1)** Developed code; **2)** Dataset; **3)** Cluster results.\
 \
-The code was developed at EPFL's Ramdya Lab. Many thanks to Pavan Ramdya, Semih Günel and the remaining lab members - it was a pleasure to work in your company.
+The code was developed at EPFL's Ramdya Lab. Many thanks to Pavan Ramdya, Semih Günel and the remaining lab members - it was a pleasure to work in your company.\
+\
+**_Figures_**  
+Core preprocessing and frame normalization:\
+![Captura de ecrã 2021-04-25, às 12 10 51](https://user-images.githubusercontent.com/45795623/115991310-b7727400-a5bf-11eb-87b0-d6dc94ec5503.png)\
+Dimensionality reduction and clustering:\
+![Captura de ecrã 2021-04-25, às 12 11 24](https://user-images.githubusercontent.com/45795623/115991345-c5c09000-a5bf-11eb-8986-8131b6e6979e.png)\
+Embedded posture-dynamics space:\
+![fr_activity](https://user-images.githubusercontent.com/45795623/115991553-f523cc80-a5c0-11eb-92c8-8de381319f21.png)\
+Distribution of fly genotypes within the embedded posture-dynamics space: (axis are inverted)\
+![aDN_CsCh_occupancy](https://user-images.githubusercontent.com/45795623/115991576-12f13180-a5c1-11eb-9f3a-e1bc80ed1b5a.png)
+![aDN_PR_occupancy](https://user-images.githubusercontent.com/45795623/115991581-15ec2200-a5c1-11eb-8869-dbaf28955d3e.png)
+![MDN_PR_occupancy](https://user-images.githubusercontent.com/45795623/115991585-1684b880-a5c1-11eb-9926-cf7621a8cc06.png)\
+Watershed segmentation:\
+![cluster_tags](https://user-images.githubusercontent.com/45795623/115991616-4207a300-a5c1-11eb-8b6d-4d49eddbd74d.png)\
+Cluster vídeo:\
+https://user-images.githubusercontent.com/45795623/115991875-74fe6680-a5c2-11eb-80a4-8ff827301733.mp4 \
+
+
+
