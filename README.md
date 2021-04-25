@@ -49,7 +49,8 @@ Distribution of fly genotypes within the embedded posture-dynamics space: (axis 
 Watershed segmentation:\
 ![cluster_tags](https://user-images.githubusercontent.com/45795623/115991616-4207a300-a5c1-11eb-8b6d-4d49eddbd74d.png)\
 Cluster vídeo:\
-![videos_cluster_42_g](https://user-images.githubusercontent.com/45795623/115992173-2eaa0700-a5c4-11eb-908f-67c1a98de02c.gif)
+![videos_cluster_42_g](https://user-images.githubusercontent.com/45795623/115992302-d7586680-a5c4-11eb-8c17-37d7f8eed633.gif)
+
 
 
 
