@@ -35,7 +35,7 @@ This repository holds: **1)** Developed code; **2)** Dataset; **3)** Cluster res
 \
 The code was developed at EPFL's Ramdya Lab. Many thanks to Pavan Ramdya, Semih Günel and the remaining lab members - it was a pleasure to work in your company.\
 \
-**_Figures_**  
+**_FIGURES_**  
 Core preprocessing and frame normalization:\
 ![Captura de ecrã 2021-04-25, às 12 10 51](https://user-images.githubusercontent.com/45795623/115991310-b7727400-a5bf-11eb-87b0-d6dc94ec5503.png)\
 Dimensionality reduction and clustering:\
@@ -49,7 +49,10 @@ Distribution of fly genotypes within the embedded posture-dynamics space: (axis 
 Watershed segmentation:\
 ![cluster_tags](https://user-images.githubusercontent.com/45795623/115991616-4207a300-a5c1-11eb-8b6d-4d49eddbd74d.png)\
 Cluster vídeo:\
-https://user-images.githubusercontent.com/45795623/115991875-74fe6680-a5c2-11eb-80a4-8ff827301733.mp4 \
+![videos_cluster_42_g](https://user-images.githubusercontent.com/45795623/115992173-2eaa0700-a5c4-11eb-908f-67c1a98de02c.gif)
+
+
+
 
 
 
